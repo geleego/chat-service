@@ -2,6 +2,7 @@ package com.example.chat_back.member.controller;
 
 import com.example.chat_back.common.auth.JwtTokenProvider;
 import com.example.chat_back.member.domain.Member;
+import com.example.chat_back.member.dto.MemberListResDto;
 import com.example.chat_back.member.dto.MemberLoginReqDto;
 import com.example.chat_back.member.dto.MemberSaveReqDto;
 import com.example.chat_back.member.service.MemberService;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -41,5 +43,11 @@ public class MemberController {
         loginInfo.put("id", member.getId());
         loginInfo.put("token", jwtToken);
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<?> memberList(){
+        List<MemberListResDto> dtos = memberService.findAll();
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 }
