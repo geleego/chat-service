@@ -1,6 +1,5 @@
 package com.example.chat_back.member.domain;
 
-import com.example.chat_back.member.dto.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
