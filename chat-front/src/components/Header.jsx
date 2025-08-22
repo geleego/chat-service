@@ -1,0 +1,109 @@
+import { AppBar, Toolbar, Button, Box } from '@mui/material'
+import styled from '@emotion/styled'
+import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+
+const StyledAppBar = styled(AppBar)`
+  background-color: #1976d2;
+`
+
+const LeftSection = styled(Box)`
+  display: flex;
+  gap: 16px;
+`
+
+const CenterSection = styled(Box)`
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+`
+
+const RightSection = styled(Box)`
+  display: flex;
+  gap: 8px;
+`
+
+const TitleButton = styled(Button)`
+  font-size: 1.25rem;
+  font-weight: bold;
+`
+
+function Header() {
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(false);
+
+  const handleLogin = () => {
+    setIsLogin(true);
+    navigate('/login');
+  };
+
+  const handleLogout = () => {
+    setIsLogin(false);
+  };
+
+  return (
+    <StyledAppBar position="static">
+      <Toolbar>
+        <LeftSection>
+          <Button
+            color="inherit"
+            onClick={() => navigate('/member/list')}
+          >
+            회원목록
+          </Button>
+          <Button
+            color="inherit"
+            onClick={() => navigate('/groupchatting/list')}
+          >
+            채팅목록
+          </Button>
+        </LeftSection>
+        
+        <CenterSection>
+          <TitleButton 
+            color="inherit" 
+            onClick={() => navigate('/')}
+          >
+            Chat Service
+          </TitleButton>
+        </CenterSection>
+        
+        <RightSection>
+          {isLogin ? (
+            <>
+              <Button
+                color="inherit"
+                onClick={() => navigate('my/chat/page')}
+              >
+                MyChatPage
+              </Button>
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+              >
+                로그아웃
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                color="inherit"
+                onClick={() => navigate('/member/create')}
+              >
+                회원가입
+              </Button>
+              <Button
+                color="inherit"
+                onClick={handleLogin}
+              >
+                로그인
+              </Button>
+            </>
+          )}
+        </RightSection>
+      </Toolbar>
+    </StyledAppBar>
+  )
+}
+
+export default Header
