@@ -1,7 +1,7 @@
 import { AppBar, Toolbar, Button, Box } from '@mui/material'
 import styled from '@emotion/styled'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const StyledAppBar = styled(AppBar)`
   background-color: #1976d2;
@@ -32,13 +32,17 @@ function Header() {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
 
-  const handleLogin = () => {
-    setIsLogin(true);
-    navigate('/login');
-  };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLogin(true);
+    }
+  }, []);
 
   const handleLogout = () => {
+    localStorage.clear();
     setIsLogin(false);
+    navigate('/');
   };
 
   return (
@@ -94,7 +98,7 @@ function Header() {
               </Button>
               <Button
                 color="inherit"
-                onClick={handleLogin}
+                onClick={() => navigate('/login')}
               >
                 로그인
               </Button>
