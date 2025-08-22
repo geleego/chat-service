@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react'
-import { Container, Grid, Card, CardContent, Typography, Table, TableHead, TableBody, TableRow, TableCell, Button } from '@mui/material'
-import axios from 'axios'
+import { useState, useEffect } from 'react';
+import { Container, Grid, Card, CardContent, Typography, Table, TableHead, TableBody, TableRow, TableCell, Button } from '@mui/material';
+import axios from 'axios';
 
 function MemberList() {
-  const [memberList, setMemberList] = useState([])
+  const [memberList, setMemberList] = useState([]);
 
   useEffect(() => {
     const fetchMemberList = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/member/list`)
-        setMemberList(response.data)
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/member/list`);
+        setMemberList(response.data);
       } catch (error) {
-        console.error('회원목록 조회 실패:', error)
+        console.error('회원목록 조회 실패:', error);
       }
     }
 
-    fetchMemberList()
+    fetchMemberList();
   }, [])
 
   const startChat = async (otherMemberId) => {
@@ -68,4 +68,4 @@ function MemberList() {
   )
 }
 
-export default MemberList
+export default MemberList;

@@ -1,12 +1,12 @@
-import './App.css'
-import Header from './components/Header'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import MemberList from './pages/MemberList'
-import GroupChatList from './pages/GroupChatList'
-import MemberCreate from './pages/MemberCreate'
-import Login from './pages/Login'
-import MyChatPage from './pages/MyChatPage'
+import './App.css';
+import Header from './components/Header';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import MemberList from './pages/MemberList';
+import GroupChatList from './pages/GroupChatList';
+import MemberCreate from './pages/MemberCreate';
+import Login from './pages/Login';
+import MyChatPage from './pages/MyChatPage';
 
 function App() {
   return (
@@ -24,4 +24,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

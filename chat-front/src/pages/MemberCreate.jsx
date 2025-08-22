@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Container, Grid, Card, CardContent, Typography, TextField, Button } from '@mui/material'
-import axios from 'axios'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Container, Grid, Card, CardContent, Typography, TextField, Button } from '@mui/material';
+import axios from 'axios';
 
 function MemberCreate() {
-  const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const memberCreate = async (e) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ function MemberCreate() {
     } catch (error) {
       console.error('회원가입 실패:', error);
     }
-  }
+  };
 
   return (
     <Container>
@@ -80,4 +80,4 @@ function MemberCreate() {
   )
 }
 
-export default MemberCreate
+export default MemberCreate;

@@ -7,4 +7,4 @@ function GroupChatList() {
   )
 }
 
-export default GroupChatList
+export default GroupChatList;

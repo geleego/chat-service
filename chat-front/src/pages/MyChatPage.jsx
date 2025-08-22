@@ -7,4 +7,4 @@ function MyChatPage() {
   )
 }
 
-export default MyChatPage
+export default MyChatPage;

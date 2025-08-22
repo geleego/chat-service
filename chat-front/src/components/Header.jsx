@@ -1,32 +1,32 @@
-import { AppBar, Toolbar, Button, Box } from '@mui/material'
-import styled from '@emotion/styled'
-import { useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { AppBar, Toolbar, Button, Box } from '@mui/material';
+import styled from '@emotion/styled';
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const StyledAppBar = styled(AppBar)`
   background-color: #1976d2;
-`
+`;
 
 const LeftSection = styled(Box)`
   display: flex;
   gap: 16px;
-`
+`;
 
 const CenterSection = styled(Box)`
   flex-grow: 1;
   display: flex;
   justify-content: center;
-`
+`;
 
 const RightSection = styled(Box)`
   display: flex;
   gap: 8px;
-`
+`;
 
 const TitleButton = styled(Button)`
   font-size: 1.25rem;
   font-weight: bold;
-`
+`;
 
 function Header() {
   const navigate = useNavigate();
@@ -40,9 +40,9 @@ function Header() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear();
-    setIsLogin(false);
-    navigate('/');
+    localStorage.clear();;
+    setIsLogin(false);;
+    navigate('/');;
   };
 
   return (
@@ -110,4 +110,4 @@ function Header() {
   )
 }
 
-export default Header
+export default Header;
