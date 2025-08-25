@@ -37,7 +37,7 @@ public class MemberController {
         // DB를 조회해서 email과 password가 일치하는지 검증
         Member member = memberService.login(memberLoginReqDto);
 
-        // 일치하면 access token 발행 >> 관련 의존성 추가 필요
+        // 일치하면 access token 발행
         String jwtToken = jwtTokenProvider.createToken(member.getEmail(), member.getRole().toString());
         Map<String,Object> loginInfo = new HashMap<>();
         loginInfo.put("id", member.getId());

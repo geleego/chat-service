@@ -34,7 +34,7 @@ public class Securityconfigs {
                 // 어떤 URL 패턴을 허용할건지 filter 처리 필요
                 // 인증 처리하지 않을 특정 URL 작성하여 Authentication 객체를 요구하지 않음 (인증 처리에서 제외). 그 외 나머지는 인증 처리.
                 .authorizeHttpRequests(a ->
-                        a.requestMatchers("/member/create","member/doLogin")
+                        a.requestMatchers("/member/create","member/doLogin", "/connect")
                                 .permitAll()    // 회원가입, 로그인은 누구나 인증 없이 접근 가능
                                 .anyRequest().authenticated()   // 위에서 지정하지 않은 나머지 모든 요청들은 인증 필요
                 )
@@ -42,7 +42,7 @@ public class Securityconfigs {
                 // 토큰 방식을 사용할 것이기 때문에, 세션 방식을 사용하지 않음
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 이전에 추가
+                // 요청 들어오면 JWT token 검증 후 인증 처리
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .build();
@@ -63,6 +63,7 @@ public class Securityconfigs {
     }
 
     @Bean
+    // PasswordEncoder 암호화 라이브러리를 싱글톤 객체로 등록하고 사용
     public PasswordEncoder makePassword() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }

@@ -32,7 +32,7 @@ public class JwtAuthFilter extends GenericFilter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        String token = httpServletRequest.getHeader("Authorization");
+        String token = httpServletRequest.getHeader("Authorization"); // HTTP 요청헤더에서 "Authorization" 헤더 값 추출
 
         try {
             if (token != null) {
@@ -43,9 +43,9 @@ public class JwtAuthFilter extends GenericFilter {
 
                 String jwtToken = token.substring(7);
 
-                // 토큰 검증
-                Claims claims = Jwts.parserBuilder()    // Jwts.parserBuilder: 파싱면서 다시 암호화 하는 메서드
-                        .setSigningKey(secretKey)
+                // Jwts.parserBuilder: 파싱면서 다시 암호화 하는 메서드 사용해서 토큰 검증
+                Claims claims = Jwts.parserBuilder()    // authentication 객체 만들기 위해
+                        .setSigningKey(secretKey)   // header + payload + signature(header + payload + secretKey)
                         .build()
                         .parseClaimsJws(jwtToken)
                         .getBody(); // claims 추출: payload에 접근할 수 있음 (email, role 접근 가능)
@@ -53,8 +53,14 @@ public class JwtAuthFilter extends GenericFilter {
                 // 인증(Authentication) 객체 생성
                 List<GrantedAuthority> authorities = new ArrayList<>();
                 authorities.add(new SimpleGrantedAuthority("ROLE_"+claims.get("role")));
-                UserDetails userDetails = new User(claims.getSubject(), "", authorities);
-                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities()); // 이메일, 비밀번호, 권한
+                UserDetails userDetails = new User(claims.getSubject(), "", authorities); // 이메일, 비밀번호, 권한
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,    // 인증된 사용자 정보
+                        "",             // 자격증명
+                        userDetails.getAuthorities()    // 사용자 권한 정보
+                );
+
+                // SecurityContext에 인증 정보 설정
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
