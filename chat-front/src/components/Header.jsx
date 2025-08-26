@@ -77,7 +77,7 @@ function Header() {
             <>
               <Button
                 color="inherit"
-                onClick={() => navigate('my/chat/page')}
+                onClick={() => navigate('/simple/chat')}
               >
                 MyChatPage
               </Button>
