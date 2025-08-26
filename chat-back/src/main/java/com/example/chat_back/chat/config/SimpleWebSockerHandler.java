@@ -25,6 +25,7 @@ public class SimpleWebSockerHandler extends TextWebSocketHandler {
     }
 
     // 사용자에게 메시지를 보내주는 메서드
+    @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         System.out.println("Received: " + payload);
