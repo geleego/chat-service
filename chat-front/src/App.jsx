@@ -7,7 +7,7 @@ import GroupChatList from './pages/GroupChatList';
 import MemberCreate from './pages/MemberCreate';
 import Login from './pages/Login';
 import MyChatPage from './pages/MyChatPage';
-import SimpleWebsocket from './pages/SimpleWebsocket';
+import StompChat from './pages/StompChat';
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
         <Route path="/member/create" element={<MemberCreate />} />
         <Route path="/login" element={<Login />} />
         <Route path="/my/chat/page" element={<MyChatPage />} />
-        <Route path="/simple/chat" element={<SimpleWebsocket />} />
+        <Route path="/stomp/chat" element={<StompChat />} />
       </Routes>
     </BrowserRouter>
   )
