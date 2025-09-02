@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, use } from 'react';
 import { Container, Grid, Card, CardContent, Typography, TextField, Button } from '@mui/material';
 import styled from '@emotion/styled';
 import SockJS from 'sockjs-client';
@@ -9,6 +9,28 @@ const ChatBox = styled.div`
   overflow-y: auto;
   border: 1px solid #ddd;
   margin-bottom: 10px;
+  padding: 14px;
+`;
+const ChatMessage = styled.div`
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
+
+  &.my-message {
+    align-self: flex-end;
+    background-color: #deefff;
+    text-align: right;
+    border-radius: 12px 0 12px 12px;
+  }
+
+  &.other-message {
+    align-self: flex-start;
+    background-color: #f1f1f1;
+    text-align: left;
+    border-radius: 0 12px 12px 12px;
+  }
 `;
 
 function StompChat() {
@@ -17,6 +39,7 @@ function StompChat() {
   const stompClient = useRef(null);
   const chatBoxRef = useRef(null);
   const token = localStorage.getItem('token');
+  const [senderEmail] = useState(() => localStorage.getItem('email'));
 
   useEffect(() => {
     // sockjs는 websocket을 내장한 향상된 js 라이브러리 (http엔드포인트 사용)
@@ -30,7 +53,8 @@ function StompChat() {
 
         console.log('received message:', message.body);
         
-        setMessages((prev) => [...prev, message.body]);
+        const parsedMessage = JSON.parse(message.body);
+        setMessages((prev) => [...prev, parsedMessage]);
         scrollToBottom();
       });
     }, (error) => {
@@ -38,9 +62,7 @@ function StompChat() {
     });
 
     return () => {
-      if (stompClient.current && stompClient.current.connected) {
-        stompClient.current.disconnect();
-      }
+      disconnectWebSocket();
     };
   }, []);
 
@@ -56,9 +78,20 @@ function StompChat() {
     if (newMessage.trim() === '') return;
 
     console.log('sending message:', newMessage);
-
-    stompClient.current.send(`/publish/1`, newMessage); //@TODO: 채팅방 변수화 예정
+    
+    const message = {
+      senderEmail: senderEmail,
+      message: newMessage
+    };
+    stompClient.current.send(`/publish/1`, JSON.stringify(message)); //@TODO: 채팅방 변수화 예정
     setNewMessage('');
+  };
+
+  const disconnectWebSocket = () => {
+    if (stompClient.current && stompClient.current.connected) {
+      stompClient.current.unsubscribe(`/topic/1`); //@TODO: 채팅방 변수화 예정
+      stompClient.current.disconnect();
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -78,7 +111,10 @@ function StompChat() {
             <CardContent>
               <ChatBox ref={chatBoxRef}>
                 {messages.map((msg, index) => (
-                  <div key={index}>{msg}</div>
+                  <ChatMessage
+                    key={index}
+                    className={`chat-message ${msg.senderEmail === senderEmail ? 'my-message' : 'other-message'}`}
+                  >{msg.senderEmail}: {msg.message}</ChatMessage>
                 ))}
               </ChatBox>
               <TextField

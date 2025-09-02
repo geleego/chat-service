@@ -18,12 +18,12 @@ function Login() {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/member/doLogin`, loginData);
       const token = response.data.token;
       const role = jwtDecode(token).role;
-      const userEmail = jwtDecode(token).sub;
+      const email = jwtDecode(token).sub;
       
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-      localStorage.setItem('email', userEmail);
-      
+      localStorage.setItem('email', email);
+
       navigate('/');
     } catch (error) {
       console.error('로그인 실패:', error);
