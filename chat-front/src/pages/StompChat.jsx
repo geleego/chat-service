@@ -16,13 +16,16 @@ function StompChat() {
   const [newMessage, setNewMessage] = useState('');
   const stompClient = useRef(null);
   const chatBoxRef = useRef(null);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     // sockjs는 websocket을 내장한 향상된 js 라이브러리 (http엔드포인트 사용)
     const sockJs = new SockJS(`${import.meta.env.VITE_API_BASE_URL}/connect`);
     stompClient.current = Stomp.over(sockJs);
     
-    stompClient.current.connect({}, () => {  //@TODO: Authorization header 추가 예정
+    stompClient.current.connect({
+      Authorization: `Bearer ${token}`
+    }, () => {
       stompClient.current.subscribe(`/topic/1`, (message) => { //@TODO: 채팅방 변수화 예정
 
         console.log('received message:', message.body);
