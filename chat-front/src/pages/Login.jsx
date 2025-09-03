@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Grid, Card, CardContent, Typography, TextField, Button } from '@mui/material';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '../contexts/AuthContext';
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -17,13 +18,7 @@ function Login() {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/member/doLogin`, loginData);
       const token = response.data.token;
-      const role = jwtDecode(token).role;
-      const email = jwtDecode(token).sub;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('role', role);
-      localStorage.setItem('email', email);
-
+      login(token);
       navigate('/');
     } catch (error) {
       console.error('로그인 실패:', error);

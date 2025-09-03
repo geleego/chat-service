@@ -1,7 +1,7 @@
 import { AppBar, Toolbar, Button, Box } from '@mui/material';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const StyledAppBar = styled(AppBar)`
   background-color: #1976d2;
@@ -30,19 +30,11 @@ const TitleButton = styled(Button)`
 
 function Header() {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsLogin(true);
-    }
-  }, []);
+  const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.clear();;
-    setIsLogin(false);;
-    navigate('/');;
+    logout();
+    navigate('/');
   };
 
   return (
@@ -73,7 +65,7 @@ function Header() {
         </CenterSection>
         
         <RightSection>
-          {isLogin ? (
+          {isAuthenticated ? (
             <>
               <Button
                 color="inherit"

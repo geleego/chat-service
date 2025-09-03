@@ -1,8 +1,8 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 import axios from 'axios';
+import { AuthProvider } from './contexts/AuthContext.jsx';
 
 // axios의 요청 헤더에 토큰을 추가하는 인터셉터를 설정 (axios 요청 시, 중간에 낚아챔)
 axios.interceptors.request.use(
@@ -20,7 +20,7 @@ axios.interceptors.request.use(
 )
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <AuthProvider>
     <App />
-  </StrictMode>,
+  </AuthProvider>
 );
