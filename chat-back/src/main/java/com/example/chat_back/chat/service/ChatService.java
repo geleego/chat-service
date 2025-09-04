@@ -5,6 +5,7 @@ import com.example.chat_back.chat.domain.ChatParticipant;
 import com.example.chat_back.chat.domain.ChatRoom;
 import com.example.chat_back.chat.domain.ReadStatus;
 import com.example.chat_back.chat.dto.ChatMessageReqDto;
+import com.example.chat_back.chat.dto.ChatRoomListResDto;
 import com.example.chat_back.chat.repository.ChatMessageRepository;
 import com.example.chat_back.chat.repository.ChatParticipantRepository;
 import com.example.chat_back.chat.repository.ChatRoomRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -86,5 +88,22 @@ public class ChatService {
                 .member(member)
                 .build();
         chatParticipantRepository.save(chatParticipant);
+    }
+
+    public List<ChatRoomListResDto> getGroupChatRooms() {
+        // 단체 채팅방 조 (is_group_chat이 "Y"인 것만)
+        List<ChatRoom> chatRooms = chatRoomRepository.findByIsGroupChat("Y");
+
+        // chatRooms의 데이터들을 ChatRoomListResDto로 변환
+        List<ChatRoomListResDto> dtos = new ArrayList<>();
+
+        for (ChatRoom c : chatRooms) {
+            ChatRoomListResDto dto = ChatRoomListResDto.builder()
+                    .roomId(c.getId())
+                    .roomName(c.getName())
+                    .build();
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }
