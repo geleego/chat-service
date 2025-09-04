@@ -4,7 +4,7 @@ import com.example.chat_back.chat.domain.ChatMessage;
 import com.example.chat_back.chat.domain.ChatParticipant;
 import com.example.chat_back.chat.domain.ChatRoom;
 import com.example.chat_back.chat.domain.ReadStatus;
-import com.example.chat_back.chat.dto.ChatMessageReqDto;
+import com.example.chat_back.chat.dto.ChatMessageDto;
 import com.example.chat_back.chat.dto.ChatRoomListResDto;
 import com.example.chat_back.chat.repository.ChatMessageRepository;
 import com.example.chat_back.chat.repository.ChatParticipantRepository;
@@ -38,7 +38,7 @@ public class ChatService {
         this.memberRepository = memberRepository;
     }
 
-    public void saveMessage(Long roomId, ChatMessageReqDto chatMessageReqDto) {
+    public void saveMessage(Long roomId, ChatMessageDto chatMessageDto) {
         // 채팅방 조회
         ChatRoom chatRoom = chatRoomRepository
                 .findById(roomId)
@@ -46,14 +46,14 @@ public class ChatService {
 
         // 보낸사람 조회
         Member sender = memberRepository
-                .findByEmail(chatMessageReqDto.getSenderEmail())
+                .findByEmail(chatMessageDto.getSenderEmail())
                 .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
 
         // 메시지 저장
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
                 .member(sender)
-                .content(chatMessageReqDto.getMessage())
+                .content(chatMessageDto.getMessage())
                 .build();
         chatMessageRepository.save(chatMessage);
 
@@ -92,7 +92,7 @@ public class ChatService {
     }
 
     public List<ChatRoomListResDto> getGroupChatRooms() {
-        // 단체 채팅방 조 (is_group_chat이 "Y"인 것만)
+        // 단체 채팅방 조건 (is_group_chat이 "Y"인 것만)
         List<ChatRoom> chatRooms = chatRoomRepository.findByIsGroupChat("Y");
 
         // chatRooms의 데이터들을 ChatRoomListResDto로 변환
@@ -133,5 +133,54 @@ public class ChatService {
                 .member(member)
                 .build();
         chatParticipantRepository.save(chatParticipant);
+    }
+
+    public List<ChatMessageDto> getChatHistory(Long roomId) {
+        // 내가 해당 채팅방의 참여자가 아닐경우 에러
+        // 채팅방, 맴버 조회
+        ChatRoom chatRoom = chatRoomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
+        Member member = memberRepository
+                .findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
+        boolean check = false;
+        for(ChatParticipant c : chatParticipants){
+            if(c.getMember().equals(member)){
+                check = true;
+            }
+        }
+        if(!check) throw new EntityNotFoundException("본인이 속하지 않은 채팅방입니다.");
+
+        // 채팅 특정 room에 대한 message 조회
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomOrderByCreatedTimeAsc(chatRoom);
+        List<ChatMessageDto> chatMessageDtos = new ArrayList<>();
+        for(ChatMessage c : chatMessages){
+            ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                    .message(c.getContent())
+                    .senderEmail(c.getMember().getEmail())
+                    .build();
+            chatMessageDtos.add(chatMessageDto);
+        }
+        return chatMessageDtos;
+    }
+
+    public boolean isRoomPaticipant(String email, Long roomId){
+        // 채팅방, 맴버 조회
+        ChatRoom chatRoom = chatRoomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
+        Member member = memberRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
+
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
+        for(ChatParticipant c : chatParticipants){
+            if(c.getMember().equals(member)){
+                return true;
+            }
+        }
+        return false;
     }
 }

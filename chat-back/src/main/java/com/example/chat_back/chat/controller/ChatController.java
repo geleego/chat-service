@@ -1,5 +1,6 @@
 package com.example.chat_back.chat.controller;
 
+import com.example.chat_back.chat.dto.ChatMessageDto;
 import com.example.chat_back.chat.dto.ChatRoomListResDto;
 import com.example.chat_back.chat.service.ChatService;
 import org.springframework.http.HttpStatus;
@@ -36,5 +37,12 @@ public class ChatController {
     public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long roomId){
         chatService.addParticipantToGroupChat(roomId);
         return ResponseEntity.ok().build();
+    }
+
+    // 이전 메시지 조회
+    @GetMapping("/history/{roomId}")
+    public ResponseEntity<?> getHistory(@PathVariable Long roomId){
+        List<ChatMessageDto> chatMessageDtos = chatService.getChatHistory(roomId);
+        return new ResponseEntity<>(chatMessageDtos, HttpStatus.OK);
     }
 }
