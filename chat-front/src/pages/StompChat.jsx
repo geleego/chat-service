@@ -4,6 +4,7 @@ import { Container, Grid, Card, CardContent, Typography, TextField, Button } fro
 import styled from '@emotion/styled';
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
+import axios from 'axios';
 
 const ChatBox = styled.div`
   height: 300px;
@@ -44,7 +45,16 @@ function StompChat() {
   const { roomId } = useParams();
 
   useEffect(() => {
-    // sockjs는 websocket을 내장한 향상된 js 라이브러리 (http엔드포인트 사용)
+    connectWebsocket();
+    fetchHistory();
+    return () => {
+      disconnectWebSocket();
+    };
+  }, []);
+
+  const connectWebsocket = () => {
+    if (stompClient.current && !stompClient.current.connected) return;
+    // sockjs: websocket을 내장한 향상된 js 라이브러리 (http엔드포인트 사용)
     const sockJs = new SockJS(`${import.meta.env.VITE_API_BASE_URL}/connect`);
     stompClient.current = Stomp.over(sockJs);
     
@@ -52,21 +62,26 @@ function StompChat() {
       Authorization: `Bearer ${token}`
     }, () => {
       stompClient.current.subscribe(`/topic/${roomId}`, (message) => {
-
         console.log('received message:', message.body);
-        
         const parsedMessage = JSON.parse(message.body);
         setMessages((prev) => [...prev, parsedMessage]);
         scrollToBottom();
-      });
+      }, {Authorization: `Bearer ${token}`});
     }, (error) => {
-      console.error('WebSocket connection error:', error);
+      console.error('WebSocket 연결 실패: ', error);
     });
+  };
 
-    return () => {
-      disconnectWebSocket();
-    };
-  }, []);
+  const fetchHistory = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/chat/history/${roomId}`
+      );
+      setMessages(response.data);
+    } catch (error) {
+      console.error('채팅 내역 불러오기 실패: ', error);
+    }
+  };
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
