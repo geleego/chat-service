@@ -20,7 +20,7 @@ function App() {
         <Route path="/member/create" element={<MemberCreate />} />
         <Route path="/login" element={<Login />} />
         <Route path="/my/chat/page" element={<MyChatPage />} />
-        <Route path="/stomp/chat" element={<StompChat />} />
+        <Route path="/stomp/chat/:roomId" element={<StompChat />} />
       </Routes>
     </BrowserRouter>
   )

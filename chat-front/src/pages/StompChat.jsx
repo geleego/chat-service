@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback, use } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { Container, Grid, Card, CardContent, Typography, TextField, Button } from '@mui/material';
 import styled from '@emotion/styled';
 import SockJS from 'sockjs-client';
@@ -38,8 +39,9 @@ function StompChat() {
   const [newMessage, setNewMessage] = useState('');
   const stompClient = useRef(null);
   const chatBoxRef = useRef(null);
-  const token = localStorage.getItem('token');
+  const [token] = useState(() => localStorage.getItem('token'));
   const [senderEmail] = useState(() => localStorage.getItem('email'));
+  const { roomId } = useParams();
 
   useEffect(() => {
     // sockjs는 websocket을 내장한 향상된 js 라이브러리 (http엔드포인트 사용)
@@ -49,7 +51,7 @@ function StompChat() {
     stompClient.current.connect({
       Authorization: `Bearer ${token}`
     }, () => {
-      stompClient.current.subscribe(`/topic/1`, (message) => { //@TODO: 채팅방 변수화 예정
+      stompClient.current.subscribe(`/topic/${roomId}`, (message) => {
 
         console.log('received message:', message.body);
         
@@ -83,13 +85,13 @@ function StompChat() {
       senderEmail: senderEmail,
       message: newMessage
     };
-    stompClient.current.send(`/publish/1`, JSON.stringify(message)); //@TODO: 채팅방 변수화 예정
+    stompClient.current.send(`/publish/${roomId}`, JSON.stringify(message));
     setNewMessage('');
   };
 
   const disconnectWebSocket = () => {
     if (stompClient.current && stompClient.current.connected) {
-      stompClient.current.unsubscribe(`/topic/1`); //@TODO: 채팅방 변수화 예정
+      stompClient.current.unsubscribe(`/topic/${roomId}`);
       stompClient.current.disconnect();
     }
   };
