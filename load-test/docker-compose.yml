@@ -1,0 +1,69 @@
+services:
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    ports: 
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=${INFLUXDB_DATABASE}
+      - INFLUXDB_USER=${INFLUXDB_USER}
+      - INFLUXDB_USER_PASSWORD=${INFLUXDB_USER_PASSWORD}
+      - INFLUXDB_ADMIN_USER=${INFLUXDB_ADMIN_USER}
+      - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_ADMIN_PASSWORD}
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    networks:
+      - chat-service-network
+
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3307:3306"
+    networks:
+      - chat-service-network
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - chat-service-network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 13000:3000
+    volumes:
+      - ./grafana-provisioning:/etc/grafana/provisioning
+      - ./grafana-dashboard:/dashboard
+    depends_on:
+      - influxdb
+      - prometheus
+    networks:
+      - chat-service-network
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    command:
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
+      - --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - chat-service-network
+
+volumes:
+  mysql-data:
+  influxdb_data:
+  influxdb_config:
+  
+networks:
+  chat-service-network:
+    driver: bridge
