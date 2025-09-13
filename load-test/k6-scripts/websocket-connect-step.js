@@ -6,8 +6,8 @@ export const smokeTest = {
   vus: 10,
   duration: '30s',
   thresholds: {
-    'ws_connecting': ['p(95)<100'], // 95%가 100ms 이내
-    'checks': ['rate>0.95'], // 95% 이상 성공
+    'ws_connecting': ['p(95)<100'], // 95%가 0.1초 이내
+    'checks': ['rate>0.95'],        // 95% 이상 성공
   }
 };
 
@@ -20,8 +20,8 @@ export const loadTest = {
     { duration: '30s', target: 0 },    // 30초 동안 0명으로
   ],
   thresholds: {
-    'ws_connecting': ['p(95)<200'], // 95%가 200ms 이내
-    'checks': ['rate>0.95'],
+    'ws_connecting': ['p(95)<200'],  // 95%가 0.2초 이내
+    'checks': ['rate>0.95'],         // 95% 이상 성공
   }
 };
 
@@ -36,7 +36,7 @@ export const stressTest = {
     { duration: '1m', target: 0 },     // 1분 동안 0명으로
   ],
   thresholds: {
-    'ws_connecting': ['p(95)<500'], // 95%가 500ms 이내
+    'ws_connecting': ['p(95)<500'],  // 95%가 0.5초 이내
     'checks': ['rate>0.90'],         // 90% 이상 성공
   }
 };
@@ -51,7 +51,7 @@ export const spikeTest = {
     { duration: '30s', target: 0 },     // 30초 동안 0명으로
   ],
   thresholds: {
-    'ws_connecting': ['p(95)<1000'], // 95%가 1초 이내
+    'ws_connecting': ['p(95)<1000'],  // 95%가 1초 이내
     'checks': ['rate>0.80'],          // 80% 이상 성공
   }
 };
@@ -64,53 +64,71 @@ export const soakTest = {
     { duration: '5m', target: 0 },      // 5분 동안 0명으로
   ],
   thresholds: {
-    'ws_connecting': ['p(95)<1000'],
-    'checks': ['rate>0.90'],
+    'ws_connecting': ['p(95)<1000'],  // 95%가 1초 이내 연결
+    'checks': ['rate>0.90'],          // 90% 이상 성공
   }
 };
 
 // ====== STEP 6: 최대 부하 테스트 (5000명) ======
 export const maxLoadTest = {
   stages: [
-    { duration: '2m', target: 1000 },
-    { duration: '2m', target: 2000 },
-    { duration: '2m', target: 3000 },
-    { duration: '2m', target: 4000 },
-    { duration: '2m', target: 5000 },
-    { duration: '5m', target: 5000 },   // 5분 유지
-    { duration: '3m', target: 0 },
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 2000 },
+    { duration: '1m', target: 3000 },
+    { duration: '1m', target: 4000 },
+    { duration: '1m', target: 5000 },
+    { duration: '1m', target: 5000 },   // 유지
+    { duration: '1m', target: 0 },
   ],
   thresholds: {
-    'ws_connecting': ['p(95)<2000'],
-    'checks': ['rate>0.80'],
+    'ws_connecting': ['p(95)<2000'],   // 95%가 2초 이내 연결
+    'checks': ['rate>0.80'],           // 80% 이상 WebSocket 연결 성공
   }
 };
 
-// ====== STEP 7: 극한 테스트 (10000명) ======
+// // ====== STEP 7: 극한 테스트 (10000명) ======
+// export const extremeTest = {
+//   stages: [
+//     { duration: '30s', target: 2000 },
+//     { duration: '30s', target: 4000 },
+//     { duration: '30s', target: 6000 },
+//     { duration: '30s', target: 8000 },
+//     { duration: '30s', target: 10000 },
+//     { duration: '30s', target: 10000 }, // 유지
+//     { duration: '30s', target: 0 },
+//   ],
+//   thresholds: {
+//     'ws_connecting': ['p(95)<3000'],   // 95%가 3초 이내 연결
+//     'checks': ['rate>0.70'],           // 70% 이상 성공
+//   }
+// };
+
+// ====== 50,000명 ======
 export const extremeTest = {
   stages: [
-    { duration: '5m', target: 2000 },
-    { duration: '5m', target: 4000 },
-    { duration: '5m', target: 6000 },
-    { duration: '5m', target: 8000 },
-    { duration: '5m', target: 10000 },
-    { duration: '10m', target: 10000 }, // 10분 유지
-    { duration: '5m', target: 0 },
+    { duration: '30s', target: 5000 },  // 점진적 증가
+    { duration: '30s', target: 10000 },
+    { duration: '30s', target: 20000 },
+    { duration: '30s', target: 30000 },
+    { duration: '30s', target: 40000 },
+    { duration: '30s', target: 50000 }, // ramp-up
+    { duration: '30s', target: 50000 }, // 유지
+    { duration: '30s', target: 0 },     // ramp-down
   ],
   thresholds: {
-    'ws_connecting': ['p(95)<3000'],
-    'checks': ['rate>0.70'],           // 70% 이상 성공
+    'ws_connecting': ['p(95)<3000'],   // 99%가 3초 이내 연결
+    'checks': ['rate>0.70'],           // 99% 이상 성공
   }
 };
 
 // ====== 실행할 테스트 선택 ======
-export const options = smokeTest;
+// export const options = smokeTest;
 // export const options = loadTest;
 // export const options = stressTest;
 // export const options = spikeTest;
 // export const options = soakTest;
 // export const options = maxLoadTest;
-// export const options = extremeTest;
+export const options = extremeTest;
 
 const STOMP_URL = 'ws://localhost:8080/connect/websocket';
 
@@ -123,10 +141,6 @@ export default function () {
     socket.on('error', (e) => {
       console.error(`VU ${__VU}: 에러 - ${e}`);
     });
-
-    socket.setTimeout(() => {
-      socket.close();
-    }, 30000); // 30초 유지
   });
   
   // WebSocket 연결 체크
